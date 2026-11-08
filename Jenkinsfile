@@ -1,5 +1,9 @@
 pipeline {
   agent any
+  environment {
+    APP_NAME = 'jenkins-demo'
+    APP_VERSION = '1.0'
+  }
   tools {
     maven 'maven-3.9'
   }
@@ -11,13 +15,13 @@ pipeline {
       }
     }
     stage('Test') {
-      steps { sh 'mvn test' }
+      steps {
+        sh 'mvn test'
+      }
     }
     stage('Deploy') {
-      steps { 
-        echo "Deploying build number ${env.BUILD_NUMBER}"
-        echo "Job name is ${env.JOB_NAME}"
-        echo "Workspace is ${env.WORKSPACE}"
+      steps {
+        echo "Deploying ${APP_NAME} version ${APP_VERSION}, build ${env.BUILD_NUMBER}"
       }
     }
   }
