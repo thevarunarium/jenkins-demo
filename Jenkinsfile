@@ -14,7 +14,11 @@ pipeline {
       steps { sh 'mvn test' }
     }
     stage('Deploy') {
-      steps { echo 'Deploying v2...' }
+      steps { 
+        echo "Deploying build number ${env.BUILD_NUMBER}"
+        echo "Job name is ${env.JOB_NAME}"
+        echo "Workspace is ${env.WORKSPACE}"
+      }
     }
   }
   post {
