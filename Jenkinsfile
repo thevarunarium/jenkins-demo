@@ -26,12 +26,11 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
-            steps {
-                sh 'echo "Deployment started"'
-                sh 'echo "The secret is available as an environment variable"'
-            }
-        }
+            stage('Deploy') {
+      steps {
+        sh 'echo "The secret is $MY_SECRET"'
+      }
+    }
     }
 
     post {
