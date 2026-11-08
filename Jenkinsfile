@@ -1,8 +1,9 @@
 pipeline {
   agent any
-  environment {
+   environment {
     APP_NAME = 'jenkins-demo'
     APP_VERSION = '1.0'
+    MY_SECRET = credentials('demo-secret')
   }
   tools {
     maven 'maven-3.9'
@@ -19,10 +20,11 @@ pipeline {
         sh 'mvn test'
       }
     }
-    stage('Deploy') {
+        stage('Deploy') {
       steps {
-        echo "Deploying ${APP_NAME} version ${APP_VERSION}, build ${env.BUILD_NUMBER}"
+        sh 'echo "The secret is $MY_SECRET"'
       }
+    }
     }
   }
   post {
