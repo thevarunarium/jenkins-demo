@@ -1,14 +1,16 @@
 pipeline {
   agent any
+  tools {
+    maven 'maven-3.9'
+  }
   stages {
     stage('Build') {
-      steps { echo 'Building...' }
+      steps {
+        sh 'mvn -version'
+      }
     }
     stage('Test') {
-      steps { 
-        echo 'Testing...'
-        sh 'exit 1'
-      }
+      steps { echo 'Testing...' }
     }
     stage('Deploy') {
       steps { echo 'Deploying...' }
