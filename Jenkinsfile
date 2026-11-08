@@ -14,7 +14,7 @@ pipeline {
       steps { sh 'mvn test' }
     }
     stage('Deploy') {
-      steps { echo 'Deploying...' }
+      steps { echo 'Deploying v2...' }
     }
   }
   post {
