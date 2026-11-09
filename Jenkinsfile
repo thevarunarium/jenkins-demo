@@ -13,6 +13,11 @@ pipeline {
             choices: ['dev', 'staging', 'prod'],
             description: 'Which environment is this build for?'
         )
+        password(
+            name: 'API_KEY',
+            defaultValue: '',
+            description: 'Practice secret, type any fake value'
+        )
         
 
         string(
@@ -71,6 +76,12 @@ pipeline {
             }
             steps {
                 echo 'WARNING: this build is for PRODUCTION'
+            }
+        }
+        stage('Check Password Param') {
+            steps {
+                sh 'echo "API key length: ${#API_KEY}"'
+                sh 'echo "API key value: $API_KEY"'
             }
         }
         stage('Deploy') {
