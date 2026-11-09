@@ -65,6 +65,14 @@ pipeline {
                 echo "Environment: ${params.ENVIRONMENT}"
             }
         }
+        stage('Prod Warning') {
+            when {
+                expression { params.ENVIRONMENT == 'prod' }
+            }
+            steps {
+                echo 'WARNING: this build is for PRODUCTION'
+            }
+        }
         stage('Deploy') {
             when {
                 expression {
