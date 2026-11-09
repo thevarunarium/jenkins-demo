@@ -8,6 +8,12 @@ pipeline {
             defaultValue: false,
             description: 'Enable or disable Docker deployment'
         )
+        choice(
+            name: 'ENVIRONMENT',
+            choices: ['dev', 'staging', 'prod'],
+            description: 'Which environment is this build for?'
+        )
+        
 
         string(
             name: 'RELEASE_NOTE',
@@ -56,9 +62,9 @@ pipeline {
         stage('Show Parameters') {
             steps {
                 echo "Release note: ${params.RELEASE_NOTE}"
+                echo "Environment: ${params.ENVIRONMENT}"
             }
         }
-
         stage('Deploy') {
             when {
                 expression {
