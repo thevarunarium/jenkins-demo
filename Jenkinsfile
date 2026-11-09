@@ -40,7 +40,7 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                echo 'Building from git v2....'
+                sh "docker run --rm ${APP_NAME}:${env.BUILD_NUMBER}"'
             }
         }
     }
