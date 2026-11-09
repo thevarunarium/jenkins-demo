@@ -1,3 +1,4 @@
+
 pipeline {
     agent any
 
@@ -40,7 +41,7 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sh "docker run --rm ${APP_NAME}:${env.BUILD_NUMBER}"'
+                sh "docker run --rm ${APP_NAME}:${env.BUILD_NUMBER}"
             }
         }
     }
