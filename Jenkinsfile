@@ -7,6 +7,7 @@ pipeline {
             name: 'RUN_DEPLOY',
             defaultValue: false,
             description: 'Enable or disable Docker deployment'
+            string(name: 'RELEASE_NOTE', defaultValue: 'no note', description: 'A short note for this build')
         )
     }
 
@@ -44,6 +45,11 @@ pipeline {
         stage('Docker Build') {
             steps {
                 sh "docker build -t ${APP_NAME}:${env.BUILD_NUMBER} ."
+            }
+        }
+        stage('Show Parameters') {
+            steps {
+                echo "Release note: ${params.RELEASE_NOTE}"
             }
         }
 
