@@ -2,6 +2,14 @@
 pipeline {
     agent any
 
+    parameters {
+        booleanParam(
+            name: 'RUN_DEPLOY',
+            defaultValue: false,
+            description: 'Enable or disable Docker deployment'
+        )
+    }
+
     environment {
         APP_NAME = 'jenkins-demo'
         APP_VERSION = '1.0'
@@ -40,6 +48,11 @@ pipeline {
         }
 
         stage('Deploy') {
+            when {
+                expression {
+                    return params.RUN_DEPLOY
+                }
+            }
             steps {
                 sh "docker run --rm ${APP_NAME}:${env.BUILD_NUMBER}"
             }
