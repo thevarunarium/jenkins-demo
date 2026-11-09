@@ -1,4 +1,3 @@
-
 pipeline {
     agent any
 
@@ -26,17 +25,24 @@ pipeline {
             }
         }
 
-            stage('Deploy') {
-      steps {
-        echo 'Building from git v2....'
-      }
-    }
-            stage('Docker Check') {
-      steps {
-        sh 'docker --version'
-        sh 'docker ps'
-      }
-    }
+        stage('Docker Check') {
+            steps {
+                sh 'docker --version'
+                sh 'docker ps'
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                sh "docker build -t ${APP_NAME}:${env.BUILD_NUMBER} ."
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo 'Building from git v2....'
+            }
+        }
     }
 
     post {
