@@ -31,6 +31,12 @@ pipeline {
         echo 'Building from git v2....'
       }
     }
+            stage('Docker Check') {
+      steps {
+        sh 'docker --version'
+        sh 'docker ps'
+      }
+    }
     }
 
     post {
