@@ -62,6 +62,7 @@ pipeline {
             }
         }
         stage('Slow Checks') {
+            failFast true
             parallel {
                 stage('Check A') {
                     steps {
@@ -70,7 +71,7 @@ pipeline {
                         echo 'Check A finished'
                     }
                 }
-                stage('Check B') {
+        stage('Check B') {
                     steps {
                         echo 'Check B started'
                         sh 'sleep 3'
