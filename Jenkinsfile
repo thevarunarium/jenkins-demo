@@ -81,7 +81,6 @@ pipeline {
         stage('Check Password Param') {
             steps {
                 sh 'echo "API key length: ${#API_KEY}"'
-                sh 'echo "API key value: $API_KEY"'
             }
         }
         stage('Deploy') {
