@@ -19,7 +19,11 @@ pipeline {
             description: 'Practice secret, type any fake value'
         )
         
-
+        text(
+            name: 'CHANGELOG',
+            defaultValue: 'line one\nline two',
+            description: 'Multi-line notes for this build'
+        )
         string(
             name: 'RELEASE_NOTE',
             defaultValue: 'no note',
