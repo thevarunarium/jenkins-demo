@@ -70,11 +70,11 @@ pipeline {
                         echo 'Check A finished'
                     }
                 }
-        stage('Check B') {
+                stage('Check B') {
                     steps {
                         echo 'Check B started'
-                        sh 'sleep 10'
-                        echo 'Check B finished'
+                        sh 'sleep 3'
+                        sh 'exit 1'
                     }
                 }
             }
