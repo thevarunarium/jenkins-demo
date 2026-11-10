@@ -61,6 +61,24 @@ pipeline {
                 sh 'docker ps'
             }
         }
+        stage('Slow Checks') {
+            parallel {
+                stage('Check A') {
+                    steps {
+                        echo 'Check A started'
+                        sh 'sleep 10'
+                        echo 'Check A finished'
+                    }
+                }
+        stage('Check B') {
+                    steps {
+                        echo 'Check B started'
+                        sh 'sleep 10'
+                        echo 'Check B finished'
+                    }
+                }
+            }
+        }
 
         stage('Docker Build') {
             steps {
