@@ -87,6 +87,11 @@ pipeline {
                 sh 'echo "API key length: ${#API_KEY}"'
             }
         }
+        stage('Show Text Param') {
+            steps {
+                echo "Changelog:\n${params.CHANGELOG}"
+            }
+        }
         stage('Deploy') {
             when {
                 expression {
