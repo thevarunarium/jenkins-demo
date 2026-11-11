@@ -27,9 +27,9 @@ pipeline {
         )
 
         string(
-            name: 'RELEASE_NOTE',
-            defaultValue: 'no note',
-            description: 'A short note for this build'
+            name: 'DEPLOY_TAG',
+            defaultValue: '',
+            description: 'Empty = deploy this build. Or enter an existing tag, e.g. 66, to roll back'
         )
 
         booleanParam(
@@ -161,8 +161,13 @@ pipeline {
 
             steps {
                 script {
-                    if (!params.PUSH_IMAGE) {
-                        error('Tick PUSH_IMAGE too: the server pulls the image from Docker Hub')
+                    def requested = params.DEPLOY_TAG?.trim()
+                    env.TAG_TO_DEPLOY = requested ? requested : env.BUILD_NUMBER
+                    if (!(env.TAG_TO_DEPLOY ==~ /^[A-Za-z0-9_.-]+$/)) {
+                        error('DEPLOY_TAG may contain only letters, digits, dot, dash and underscore')
+                    }
+                    if (!requested && !params.PUSH_IMAGE) {
+                        error('Tick PUSH_IMAGE, or enter a DEPLOY_TAG that already exists on Docker Hub')
                     }
                 }
 
@@ -175,9 +180,9 @@ pipeline {
                         set -e
                         trap 'docker logout' EXIT
                         printf '%s' "$DH_TOKEN" | docker login -u "$DH_USER" --password-stdin
-                        docker pull ${DOCKERHUB_REPO}:${BUILD_NUMBER}
+                        docker pull ${DOCKERHUB_REPO}:${TAG_TO_DEPLOY}
                         docker rm -f jenkins-demo || true
-                        docker run -d --name jenkins-demo ${DOCKERHUB_REPO}:${BUILD_NUMBER}
+                        docker run -d --name jenkins-demo ${DOCKERHUB_REPO}:${TAG_TO_DEPLOY}
                     '''
                 }
 
