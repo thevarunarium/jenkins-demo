@@ -1,6 +1,6 @@
 pipeline {
-    agent any
-
+        agent { label 'ec2-agent' }
+        options { skipDefaultCheckout true }
     parameters {
         booleanParam(
             name: 'PUSH_IMAGE',
