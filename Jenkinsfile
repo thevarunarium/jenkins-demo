@@ -155,6 +155,9 @@ pipeline {
                 beforeInput true
                 expression { return params.RUN_DEPLOY }
             }
+            options {
+                timeout(time: 2, unit: 'MINUTES')
+            }
             input {
                 message 'Deploy this build to EC2?'
                 ok 'Deploy'
