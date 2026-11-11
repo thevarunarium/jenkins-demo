@@ -151,13 +151,32 @@ pipeline {
         }
 
         stage('Deploy') {
+            agent { label 'ec2-agent' }
             when {
-                expression {
-                    return params.RUN_DEPLOY
-                }
+                beforeAgent true
+                expression { return params.RUN_DEPLOY }
             }
             steps {
-                sh "docker run --rm ${APP_NAME}:${env.BUILD_NUMBER}"
+                script {
+                    if (!params.PUSH_IMAGE) {
+                        error('Tick PUSH_IMAGE too: the server pulls the image from Docker Hub')
+                    }
+                }
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DH_USER',
+                    passwordVariable: 'DH_TOKEN'
+                )]) {
+                    sh '''
+                        set -e
+                        trap 'docker logout' EXIT
+                        printf '%s' "$DH_TOKEN" | docker login -u "$DH_USER" --password-stdin
+                        docker pull ${DOCKERHUB_REPO}:${BUILD_NUMBER}
+                        docker rm -f jenkins-demo || true
+                        docker run -d --name jenkins-demo ${DOCKERHUB_REPO}:${BUILD_NUMBER}
+                    '''
+                }
+                sh 'sleep 3; docker ps -a --filter name=jenkins-demo; docker logs jenkins-demo'
             }
         }
     }
