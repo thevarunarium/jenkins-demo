@@ -2,16 +2,17 @@
 pipeline {
     agent any
 
-    parameters {
         booleanParam(
-            name: 'RUN_DEPLOY',
+            name: 'PUSH_IMAGE',
             defaultValue: false,
-            description: 'Enable or disable Docker deployment'
+            description: 'Push the image to Docker Hub'
+        )
         )
         choice(
             name: 'ENVIRONMENT',
             choices: ['dev', 'staging', 'prod'],
             description: 'Which environment is this build for?'
+            
         )
         password(
             name: 'API_KEY',
@@ -35,6 +36,7 @@ pipeline {
         APP_NAME = 'jenkins-demo'
         APP_VERSION = '1.0'
         MY_SECRET = credentials('demo-secret')
+        DOCKERHUB_REPO = 'varunspark/jenkins-demo'
     }
 
     tools {
@@ -46,6 +48,25 @@ pipeline {
             steps {
                 sh 'mvn clean package'
                 archiveArtifacts artifacts: 'target/*.jar'
+            }
+        }
+        stage('Docker Push') {
+            when {
+                expression { params.PUSH_IMAGE }
+            }
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DH_USER',
+                    passwordVariable: 'DH_TOKEN'
+                )]) {
+                    sh '''
+                        printf '%s' "$DH_TOKEN" | docker login -u "$DH_USER" --password-stdin
+                        docker tag ${APP_NAME}:${BUILD_NUMBER} ${DOCKERHUB_REPO}:${BUILD_NUMBER}
+                        docker push ${DOCKERHUB_REPO}:${BUILD_NUMBER}
+                        docker logout
+                    '''
+                }
             }
         }
 
