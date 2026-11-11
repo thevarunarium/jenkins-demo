@@ -149,7 +149,20 @@ pipeline {
                 echo "Changelog:\n${params.CHANGELOG}"
             }
         }
-
+        stage('Approve Deploy') {
+            agent none
+            when {
+                beforeInput true
+                expression { return params.RUN_DEPLOY }
+            }
+            input {
+                message 'Deploy this build to EC2?'
+                ok 'Deploy'
+            }
+            steps {
+                echo 'Deployment approved'
+            }
+        }
         stage('Deploy') {
             agent { label 'ec2-agent' }
             options { skipDefaultCheckout true }
