@@ -1,34 +1,41 @@
-
 pipeline {
     agent any
 
+    parameters {
         booleanParam(
             name: 'PUSH_IMAGE',
             defaultValue: false,
             description: 'Push the image to Docker Hub'
         )
-        )
+
         choice(
             name: 'ENVIRONMENT',
             choices: ['dev', 'staging', 'prod'],
             description: 'Which environment is this build for?'
-            
         )
+
         password(
             name: 'API_KEY',
             defaultValue: '',
             description: 'Practice secret, type any fake value'
         )
-        
+
         text(
             name: 'CHANGELOG',
             defaultValue: 'line one\nline two',
             description: 'Multi-line notes for this build'
         )
+
         string(
             name: 'RELEASE_NOTE',
             defaultValue: 'no note',
             description: 'A short note for this build'
+        )
+
+        booleanParam(
+            name: 'RUN_DEPLOY',
+            defaultValue: false,
+            description: 'Run deployment stage'
         )
     }
 
@@ -44,22 +51,26 @@ pipeline {
     }
 
     stages {
+
         stage('Build') {
             steps {
                 sh 'mvn clean package'
                 archiveArtifacts artifacts: 'target/*.jar'
             }
         }
+
         stage('Docker Push') {
             when {
                 expression { params.PUSH_IMAGE }
             }
             steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-creds',
-                    usernameVariable: 'DH_USER',
-                    passwordVariable: 'DH_TOKEN'
-                )]) {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub-creds',
+                        usernameVariable: 'DH_USER',
+                        passwordVariable: 'DH_TOKEN'
+                    )
+                ]) {
                     sh '''
                         printf '%s' "$DH_TOKEN" | docker login -u "$DH_USER" --password-stdin
                         docker tag ${APP_NAME}:${BUILD_NUMBER} ${DOCKERHUB_REPO}:${BUILD_NUMBER}
@@ -82,8 +93,10 @@ pipeline {
                 sh 'docker ps'
             }
         }
+
         stage('Slow Checks') {
             failFast true
+
             parallel {
                 stage('Check A') {
                     steps {
@@ -92,6 +105,7 @@ pipeline {
                         echo 'Check A finished'
                     }
                 }
+
                 stage('Check B') {
                     steps {
                         echo 'Check B started'
@@ -114,6 +128,7 @@ pipeline {
                 echo "Environment: ${params.ENVIRONMENT}"
             }
         }
+
         stage('Prod Warning') {
             when {
                 expression { params.ENVIRONMENT == 'prod' }
@@ -122,16 +137,19 @@ pipeline {
                 echo 'WARNING: this build is for PRODUCTION'
             }
         }
+
         stage('Check Password Param') {
             steps {
-                sh 'echo "API key length: ${#API_KEY}"'
+                sh "echo 'API key length: ${params.API_KEY.length()}'"
             }
         }
+
         stage('Show Text Param') {
             steps {
                 echo "Changelog:\n${params.CHANGELOG}"
             }
         }
+
         stage('Deploy') {
             when {
                 expression {
