@@ -1,6 +1,10 @@
 pipeline {
-        agent { label 'ec2-agent' }
-        options { skipDefaultCheckout true }
+    agent { label 'ec2-agent' }
+
+    options {
+        skipDefaultCheckout true
+    }
+
     parameters {
         booleanParam(
             name: 'PUSH_IMAGE',
@@ -152,16 +156,19 @@ pipeline {
 
         stage('Deploy') {
             agent { label 'ec2-agent' }
+
             when {
                 beforeAgent true
                 expression { return params.RUN_DEPLOY }
             }
+
             steps {
                 script {
                     if (!params.PUSH_IMAGE) {
                         error('Tick PUSH_IMAGE too: the server pulls the image from Docker Hub')
                     }
                 }
+
                 withCredentials([usernamePassword(
                     credentialsId: 'dockerhub-creds',
                     usernameVariable: 'DH_USER',
@@ -176,6 +183,7 @@ pipeline {
                         docker run -d --name jenkins-demo ${DOCKERHUB_REPO}:${BUILD_NUMBER}
                     '''
                 }
+
                 sh 'sleep 3; docker ps -a --filter name=jenkins-demo; docker logs jenkins-demo'
             }
         }
