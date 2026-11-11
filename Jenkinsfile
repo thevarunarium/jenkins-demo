@@ -140,7 +140,7 @@ pipeline {
 
         stage('Check Password Param') {
             steps {
-                sh "echo 'API key length: ${params.API_KEY.length()}'"
+                sh 'echo "API key length: ${#API_KEY}"'
             }
         }
 
