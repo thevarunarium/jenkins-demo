@@ -1,9 +1,5 @@
 pipeline {
-    agent { label 'ec2-agent' }
-
-    options {
-        skipDefaultCheckout true
-    }
+    agent any }
 
     parameters {
         booleanParam(
@@ -156,6 +152,7 @@ pipeline {
 
         stage('Deploy') {
             agent { label 'ec2-agent' }
+            options { skipDefaultCheckout true }
 
             when {
                 beforeAgent true
