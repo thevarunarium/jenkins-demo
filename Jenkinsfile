@@ -59,28 +59,6 @@ pipeline {
             }
         }
 
-        stage('Docker Push') {
-            when {
-                expression { params.PUSH_IMAGE }
-            }
-            steps {
-                withCredentials([
-                    usernamePassword(
-                        credentialsId: 'dockerhub-creds',
-                        usernameVariable: 'DH_USER',
-                        passwordVariable: 'DH_TOKEN'
-                    )
-                ]) {
-                    sh '''
-                        printf '%s' "$DH_TOKEN" | docker login -u "$DH_USER" --password-stdin
-                        docker tag ${APP_NAME}:${BUILD_NUMBER} ${DOCKERHUB_REPO}:${BUILD_NUMBER}
-                        docker push ${DOCKERHUB_REPO}:${BUILD_NUMBER}
-                        docker logout
-                    '''
-                }
-            }
-        }
-
         stage('Test') {
             steps {
                 sh 'mvn test'
@@ -119,6 +97,28 @@ pipeline {
         stage('Docker Build') {
             steps {
                 sh "docker build -t ${APP_NAME}:${env.BUILD_NUMBER} ."
+            }
+        }
+
+        stage('Docker Push') {
+            when {
+                expression { params.PUSH_IMAGE }
+            }
+            steps {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub-creds',
+                        usernameVariable: 'DH_USER',
+                        passwordVariable: 'DH_TOKEN'
+                    )
+                ]) {
+                    sh '''
+                        printf '%s' "$DH_TOKEN" | docker login -u "$DH_USER" --password-stdin
+                        docker tag ${APP_NAME}:${BUILD_NUMBER} ${DOCKERHUB_REPO}:${BUILD_NUMBER}
+                        docker push ${DOCKERHUB_REPO}:${BUILD_NUMBER}
+                        docker logout
+                    '''
+                }
             }
         }
 
