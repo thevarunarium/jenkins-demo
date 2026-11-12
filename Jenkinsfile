@@ -1,3 +1,4 @@
+
 pipeline {
     agent any
     options {
@@ -105,7 +106,10 @@ pipeline {
 
         stage('Docker Push') {
             when {
-                expression { params.PUSH_IMAGE }
+                allOf {
+                    branch 'main'
+                    expression { params.PUSH_IMAGE }
+                }
             }
             steps {
                 withCredentials([
@@ -152,11 +156,15 @@ pipeline {
                 echo "Changelog:\n${params.CHANGELOG}"
             }
         }
+
         stage('Approve Deploy') {
             agent none
             when {
                 beforeInput true
-                expression { return params.RUN_DEPLOY }
+                allOf {
+                    branch 'main'
+                    expression { return params.RUN_DEPLOY }
+                }
             }
             options {
                 timeout(time: 2, unit: 'MINUTES')
@@ -169,13 +177,17 @@ pipeline {
                 echo 'Deployment approved'
             }
         }
+
         stage('Deploy') {
             agent { label 'ec2-agent' }
             options { skipDefaultCheckout true }
 
             when {
                 beforeAgent true
-                expression { return params.RUN_DEPLOY }
+                allOf {
+                    branch 'main'
+                    expression { return params.RUN_DEPLOY }
+                }
             }
 
             steps {
